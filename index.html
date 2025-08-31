@@ -207,6 +207,20 @@
             font-size: 13px;
         }
 
+        .back-to-login {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .back-to-login a {
+            color: #2575fc;
+            text-decoration: none;
+        }
+
+        .back-to-login a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 480px) {
             .container {
                 width: 100%;
@@ -239,7 +253,7 @@
 
             <div class="remember-forgot">
                 <label><input type="checkbox" name="remember"> Remember Me</label>
-                <a href="#">Forgot Password?</a>
+                <a href="#" onclick="showForgotPasswordForm()">Forgot Password?</a>
             </div>
 
             <input id="btn" type="submit" value="Login">
@@ -304,18 +318,104 @@
         </form>
     </div>
 
+    <div class="container" id="forgotPasswordContainer" style="display: none;">
+        <h2>Reset Password</h2>
+        
+        <div id="forgotMessage" class="message"></div>
+        
+        <div class="token-info">
+            <i class="fas fa-info-circle"></i> Enter your email address and we'll send you a link to reset your password.
+        </div>
+
+        <form id="forgotPasswordForm">
+            <div class="form-group">
+                <input type="email" id="forgotEmail" name="email" required>
+                <label for="forgotEmail">Email</label>
+                <i class="fas fa-envelope"></i>
+            </div>
+
+            <input id="btn" type="submit" value="Send Reset Link">
+
+            <div class="back-to-login">
+                <a href="#" onclick="showLoginForm()">Back to Login</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="container" id="resetPasswordContainer" style="display: none;">
+        <h2>Set New Password</h2>
+        
+        <div id="resetMessage" class="message"></div>
+        
+        <div class="token-info">
+            <i class="fas fa-info-circle"></i> Please enter your new password and the reset token sent to your email.
+        </div>
+
+        <form id="resetPasswordForm">
+            <div class="form-group">
+                <input type="password" id="newPassword" name="password" required>
+                <label for="newPassword">New Password</label>
+                <i class="fas fa-lock"></i>
+                <span class="password-toggle" onclick="togglePassword('newPassword')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+
+            <div class="form-group">
+                <input type="password" id="confirmNewPassword" name="confirm_password" required>
+                <label for="confirmNewPassword">Confirm New Password</label>
+                <i class="fas fa-lock"></i>
+                <span class="password-toggle" onclick="togglePassword('confirmNewPassword')">
+                    <i class="fas fa-eye"></i>
+                </span>
+            </div>
+            
+            <div class="form-group">
+                <input type="text" id="resetToken" name="token" required>
+                <label for="resetToken">Reset Token</label>
+                <i class="fas fa-key"></i>
+            </div>
+
+            <input id="btn" type="submit" value="Reset Password">
+
+            <div class="back-to-login">
+                <a href="#" onclick="showLoginForm()">Back to Login</a>
+            </div>
+        </form>
+    </div>
+
     <script>
-        // Toggle between login and register forms
+        // Toggle between forms
+        function showLoginForm() {
+            document.getElementById('loginContainer').style.display = 'block';
+            document.getElementById('registerContainer').style.display = 'none';
+            document.getElementById('forgotPasswordContainer').style.display = 'none';
+            document.getElementById('resetPasswordContainer').style.display = 'none';
+            document.getElementById('message').style.display = 'none';
+        }
+
         function showRegisterForm() {
             document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('registerContainer').style.display = 'block';
+            document.getElementById('forgotPasswordContainer').style.display = 'none';
+            document.getElementById('resetPasswordContainer').style.display = 'none';
             document.getElementById('regMessage').style.display = 'none';
         }
 
-        function showLoginForm() {
+        function showForgotPasswordForm() {
+            document.getElementById('loginContainer').style.display = 'none';
             document.getElementById('registerContainer').style.display = 'none';
-            document.getElementById('loginContainer').style.display = 'block';
-            document.getElementById('message').style.display = 'none';
+            document.getElementById('forgotPasswordContainer').style.display = 'block';
+            document.getElementById('resetPasswordContainer').style.display = 'none';
+            document.getElementById('forgotMessage').style.display = 'none';
+        }
+
+        function showResetPasswordForm() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('registerContainer').style.display = 'none';
+            document.getElementById('forgotPasswordContainer').style.display = 'none';
+            document.getElementById('resetPasswordContainer').style.display = 'block';
+            document.getElementById('resetMessage').style.display = 'none';
         }
 
         // Toggle password visibility
@@ -418,6 +518,84 @@
             // Simulate API call delay
             setTimeout(() => {
                 showMessage('Registration successful! You can now login.', 'success', messageDiv);
+                setTimeout(() => {
+                    showLoginForm();
+                }, 2000);
+            }, 1500);
+        });
+
+        // Handle forgot password form submission
+        document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('forgotEmail').value;
+            const messageDiv = document.getElementById('forgotMessage');
+            
+            // Simple validation
+            if (!email) {
+                showMessage('Please enter your email address', 'error', messageDiv);
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('Please enter a valid email address', 'error', messageDiv);
+                return;
+            }
+            
+            // Simulate sending reset email
+            showMessage('Sending reset instructions...', 'success', messageDiv);
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                showMessage('Password reset instructions sent to your email.', 'success', messageDiv);
+                // In a real application, this would show instructions to check email
+                setTimeout(() => {
+                    showResetPasswordForm();
+                }, 2000);
+            }, 1500);
+        });
+
+        // Handle reset password form submission
+        document.getElementById('resetPasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+            const token = document.getElementById('resetToken').value;
+            const messageDiv = document.getElementById('resetMessage');
+            
+            // Simple validation
+            if (!password || !confirmPassword || !token) {
+                showMessage('Please fill in all fields', 'error', messageDiv);
+                return;
+            }
+            
+            // Password validation
+            if (password.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error', messageDiv);
+                return;
+            }
+            
+            // Confirm password validation
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error', messageDiv);
+                return;
+            }
+            
+            // Token validation (in a real app, this would be checked against a database)
+            if (token !== "RESET456") {
+                showMessage('Invalid reset token', 'error', messageDiv);
+                return;
+            }
+            
+            // Simulate password reset process
+            showMessage('Resetting password...', 'success', messageDiv);
+            
+            // Simulate API call delay
+            setTimeout(() => {
+                showMessage('Password reset successfully! You can now login.', 'success', messageDiv);
                 setTimeout(() => {
                     showLoginForm();
                 }, 2000);
